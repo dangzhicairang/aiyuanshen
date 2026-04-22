@@ -14,6 +14,7 @@ namespace GachaDemo.Presentation
 
         [SerializeField] private string poolId = "limited_character";
         [SerializeField] private string configPath = "Configs/gacha_config";
+        [SerializeField] private bool autoRefillCurrencyForDemo = true;
         [SerializeField] private GachaPanelUI gachaPanel;
         [SerializeField] private ResultPanelUI resultPanel;
         [SerializeField] private RevealTimelineController revealTimeline;
@@ -29,15 +30,33 @@ namespace GachaDemo.Presentation
             _useCase = new GachaUseCase(new MockGachaService(repository, _storage));
 
             gachaPanel.OnDrawClicked += HandleDraw;
-            gachaPanel.OnSkipClicked += () => _skipRequested = true;
+            gachaPanel.OnSkipClicked += HandleSkip;
             RefreshStatus(_storage.LoadCurrency(CurrencyKey, DemoRefillAmount), _storage.LoadPity(poolId));
             resultPanel.Hide();
+        }
+
+        private void OnDisable()
+        {
+            if (gachaPanel == null)
+            {
+                return;
+            }
+
+            gachaPanel.OnDrawClicked -= HandleDraw;
+            gachaPanel.OnSkipClicked -= HandleSkip;
         }
 
         private void HandleDraw(int drawCount)
         {
             StopAllCoroutines();
             StartCoroutine(PlayDraw(drawCount));
+        }
+
+        private void HandleSkip()
+        {
+            _skipRequested = true;
+            revealTimeline?.RequestSkip();
+            resultPanel?.RequestSkipReveal();
         }
 
         private IEnumerator PlayDraw(int drawCount)
@@ -53,10 +72,10 @@ namespace GachaDemo.Presentation
             }
             catch (System.Exception ex)
             {
-                if (ex.Message.Contains("Not enough currency"))
+                if (autoRefillCurrencyForDemo && ex.Message.Contains("Not enough currency"))
                 {
                     _storage.SaveCurrency(CurrencyKey, DemoRefillAmount);
-                    Debug.Log("演示模式：原石不足，已自动补充。");
+                    Debug.Log("演示模式：原石不足，已自动补充到 32000。");
                     result = _useCase.Draw(poolId, drawCount);
                 }
                 else

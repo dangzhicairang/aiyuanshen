@@ -1,0 +1,19 @@
+{
+  "DefaultCharacterPortrait": "GachaTheme/panel_bg",
+  "DefaultWeaponPortrait": "GachaTheme/buttons_source",
+  "DefaultMaterialPortrait": "GachaTheme/card_bg",
+  "Cards": [
+    { "RewardId": "c_001", "PortraitSprite": "GachaTheme/Cards/c_001", "BadgeText": "火 · 角色", "Subtitle": "限定五星" },
+    { "RewardId": "c_002", "PortraitSprite": "GachaTheme/Cards/c_002", "BadgeText": "雷 · 角色", "Subtitle": "常驻五星" },
+    { "RewardId": "w_501", "PortraitSprite": "GachaTheme/Cards/w_501", "BadgeText": "五星武器", "Subtitle": "常驻武器" },
+    { "RewardId": "c_101", "PortraitSprite": "GachaTheme/Cards/c_101", "BadgeText": "冰 · 角色", "Subtitle": "UP 四星" },
+    { "RewardId": "c_102", "PortraitSprite": "GachaTheme/Cards/c_102", "BadgeText": "风 · 角色", "Subtitle": "UP 四星" },
+    { "RewardId": "c_103", "PortraitSprite": "GachaTheme/Cards/c_103", "BadgeText": "水 · 角色", "Subtitle": "UP 四星" },
+    { "RewardId": "w_401", "PortraitSprite": "GachaTheme/Cards/w_401", "BadgeText": "四星武器", "Subtitle": "常驻武器" },
+    { "RewardId": "w_402", "PortraitSprite": "GachaTheme/Cards/w_402", "BadgeText": "四星武器", "Subtitle": "常驻武器" },
+    { "RewardId": "w_301", "PortraitSprite": "GachaTheme/Cards/w_301", "BadgeText": "三星武器", "Subtitle": "常驻武器" },
+    { "RewardId": "w_302", "PortraitSprite": "GachaTheme/Cards/w_302", "BadgeText": "三星武器", "Subtitle": "常驻武器" },
+    { "RewardId": "w_303", "PortraitSprite": "GachaTheme/Cards/w_303", "BadgeText": "三星武器", "Subtitle": "常驻武器" },
+    { "RewardId": "w_304", "PortraitSprite": "GachaTheme/Cards/w_304", "BadgeText": "三星武器", "Subtitle": "常驻武器" }
+  ]
+}

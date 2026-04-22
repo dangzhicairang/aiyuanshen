@@ -1,0 +1,35 @@
+{
+  "Title": "角色活动祈愿",
+  "PanelBackground": { "R": 0.07, "G": 0.09, "B": 0.14, "A": 0.93 },
+  "InfoStripBackground": { "R": 0.03, "G": 0.05, "B": 0.10, "A": 0.72 },
+  "TitleColor": { "R": 0.96, "G": 0.92, "B": 0.78, "A": 1.0 },
+  "CurrencyColor": { "R": 0.82, "G": 0.90, "B": 1.0, "A": 1.0 },
+  "StateColor": { "R": 0.68, "G": 0.82, "B": 0.95, "A": 1.0 },
+  "ResultColor": { "R": 0.95, "G": 0.95, "B": 1.0, "A": 1.0 },
+  "FiveStarOutlineColor": { "R": 1.0, "G": 0.82, "B": 0.30, "A": 0.9 },
+  "ThreeStarRevealColor": { "R": 0.54, "G": 0.78, "B": 1.0, "A": 1.0 },
+  "FourStarRevealColor": { "R": 0.72, "G": 0.56, "B": 1.0, "A": 1.0 },
+  "FiveStarRevealColor": { "R": 1.0, "G": 0.84, "B": 0.32, "A": 1.0 },
+  "PanelSprite": "GachaTheme/panel_bg",
+  "CardBackgroundSprite": "GachaTheme/card_bg",
+  "ButtonSprites": {
+    "SingleDraw": "GachaTheme/btn_single",
+    "TenDraw": "GachaTheme/btn_ten",
+    "Skip": "GachaTheme/btn_skip"
+  },
+  "CardBaseColors": {
+    "ThreeStar": { "R": 0.43, "G": 0.58, "B": 0.82, "A": 0.92 },
+    "FourStar": { "R": 0.69, "G": 0.52, "B": 0.95, "A": 0.95 },
+    "FiveStar": { "R": 0.95, "G": 0.73, "B": 0.28, "A": 0.95 }
+  },
+  "CardStripeColors": {
+    "ThreeStar": { "R": 0.75, "G": 0.86, "B": 1.0, "A": 0.9 },
+    "FourStar": { "R": 0.83, "G": 0.71, "B": 1.0, "A": 0.95 },
+    "FiveStar": { "R": 1.0, "G": 0.90, "B": 0.55, "A": 0.96 }
+  },
+  "CardGlowColors": {
+    "ThreeStar": { "R": 0.52, "G": 0.70, "B": 1.0, "A": 0.13 },
+    "FourStar": { "R": 0.72, "G": 0.56, "B": 1.0, "A": 0.18 },
+    "FiveStar": { "R": 1.0, "G": 0.82, "B": 0.32, "A": 0.22 }
+  }
+}

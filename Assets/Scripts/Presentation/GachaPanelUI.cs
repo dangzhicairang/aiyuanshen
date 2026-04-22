@@ -36,19 +36,22 @@ namespace GachaDemo.Presentation
             {
                 OnSkipClicked?.Invoke();
             });
+
+            skipButton.interactable = false;
         }
 
-        public void SetCurrency(int amount) => currencyText.text = $"原石: {amount}";
+        public void SetCurrency(int amount) => currencyText.text = $"原石  {amount:N0}";
 
         public void SetPityState(int pity4, int pity5, bool guaranteed)
         {
-            stateText.text = $"四星保底进度 {pity4}/10 ｜ 五星保底进度 {pity5}/90 ｜ 下次五星是否必UP：{(guaranteed ? "是" : "否")}";
+            stateText.text = $"四星保底 {pity4}/10  ·  五星保底 {pity5}/90  ·  下次五星 {(guaranteed ? "必定 UP" : "50/50")}";
         }
 
         public void SetButtonsInteractable(bool interactable)
         {
             singleDrawButton.interactable = interactable;
             tenDrawButton.interactable = interactable;
+            skipButton.interactable = !interactable;
         }
     }
 }

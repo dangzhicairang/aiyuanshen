@@ -1,14 +1,15 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.UI;
 using UnityEngine.TextCore.LowLevel;
+using UnityEngine.UI;
 
 namespace GachaDemo.Presentation
 {
     public sealed class GachaDemoBootstrap : MonoBehaviour
     {
         private static TMP_FontAsset _runtimeCjkFont;
+        private const string UiRootPrefabPath = "GachaTheme/GachaRootPrefab";
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void BuildIfMissing()
@@ -21,55 +22,113 @@ namespace GachaDemo.Presentation
             EnsureMainCamera();
             EnsureEventSystem();
 
+            var prefab = Resources.Load<GameObject>(UiRootPrefabPath);
+            if (prefab != null)
+            {
+                Object.Instantiate(prefab);
+                return;
+            }
+
+            var theme = GachaThemeRuntime.Get();
             var canvasGo = new GameObject("GachaCanvas", typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
             var canvas = canvasGo.GetComponent<Canvas>();
             canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+
             var scaler = canvasGo.GetComponent<CanvasScaler>();
             scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
             scaler.referenceResolution = new Vector2(1920f, 1080f);
 
-            var panel = CreatePanel(canvasGo.transform, new Vector2(0.5f, 0.5f), new Vector2(800f, 500f));
+            var screenBackdrop = CreatePanel(canvasGo.transform, new Vector2(0.5f, 0.5f), new Vector2(1920f, 1080f));
+            screenBackdrop.name = "ScreenBackdrop";
+            var screenBackdropImage = screenBackdrop.GetComponent<Image>();
+            screenBackdropImage.color = new Color(0.03f, 0.06f, 0.12f, 1f);
+            screenBackdropImage.raycastTarget = false;
+            TryApplySprite(screenBackdropImage, FirstNotEmpty(theme.PanelSprite, "GachaTheme/panel_bg"));
+
+            var panel = CreatePanel(canvasGo.transform, new Vector2(0.5f, 0.5f), new Vector2(1220f, 720f));
             panel.name = "Panel";
-            panel.GetComponent<Image>().color = new Color(0.07f, 0.09f, 0.14f, 0.9f);
-            panel.sizeDelta = new Vector2(1220f, 720f);
-            TryApplySprite(panel.GetComponent<Image>(), "GachaTheme/panel_bg");
+            var panelImage = panel.GetComponent<Image>();
+            panelImage.color = theme.PanelBackground.ToColor(new Color(0.07f, 0.09f, 0.14f, 0.93f));
+            TryApplySprite(panelImage, FirstNotEmpty(theme.PanelSprite, "GachaTheme/panel_bg"));
+
+            var panelVignette = CreatePanel(panel.transform, new Vector2(0.5f, 0.5f), new Vector2(1210f, 710f));
+            panelVignette.name = "PanelVignette";
+            var panelVignetteImage = panelVignette.GetComponent<Image>();
+            panelVignetteImage.color = new Color(0f, 0f, 0f, 0.2f);
+            panelVignetteImage.raycastTarget = false;
+
+            var featuredBanner = CreatePanel(panel.transform, new Vector2(0.5f, 0.68f), new Vector2(1080f, 300f));
+            featuredBanner.name = "FeaturedBanner";
+            var featuredBannerImage = featuredBanner.GetComponent<Image>();
+            featuredBannerImage.color = new Color(0.13f, 0.19f, 0.31f, 0.44f);
+            featuredBannerImage.raycastTarget = false;
+
+            var sideGlowLeft = CreatePanel(panel.transform, new Vector2(0f, 0.5f), new Vector2(120f, 560f));
+            sideGlowLeft.name = "SideGlowLeft";
+            sideGlowLeft.anchoredPosition = new Vector2(70f, 0f);
+            var sideGlowLeftImage = sideGlowLeft.GetComponent<Image>();
+            sideGlowLeftImage.color = new Color(0.38f, 0.58f, 0.96f, 0.16f);
+            sideGlowLeftImage.raycastTarget = false;
+
+            var sideGlowRight = CreatePanel(panel.transform, new Vector2(1f, 0.5f), new Vector2(120f, 560f));
+            sideGlowRight.name = "SideGlowRight";
+            sideGlowRight.anchoredPosition = new Vector2(-70f, 0f);
+            var sideGlowRightImage = sideGlowRight.GetComponent<Image>();
+            sideGlowRightImage.color = new Color(0.7f, 0.58f, 0.98f, 0.16f);
+            sideGlowRightImage.raycastTarget = false;
 
             var infoStrip = CreatePanel(panel.transform, new Vector2(0.5f, 1f), new Vector2(980f, 130f));
             infoStrip.name = "InfoStrip";
-            var infoStripImage = infoStrip.GetComponent<Image>();
-            infoStripImage.color = new Color(0.03f, 0.05f, 0.1f, 0.7f);
             infoStrip.anchoredPosition = new Vector2(0f, -90f);
+            infoStrip.GetComponent<Image>().color = theme.InfoStripBackground.ToColor(new Color(0.03f, 0.05f, 0.1f, 0.7f));
 
-            var titleText = CreateText(panel.transform, "TitleText", new Vector2(0f, 255f), 34);
-            titleText.text = "星穹祈愿";
-            titleText.color = new Color(0.95f, 0.92f, 0.75f, 1f);
+            var titleText = CreateText(panel.transform, "TitleText", new Vector2(0f, 255f), 36);
+            titleText.text = string.IsNullOrWhiteSpace(theme.Title) ? "角色活动祈愿" : theme.Title;
+            titleText.color = theme.TitleColor.ToColor(new Color(0.96f, 0.92f, 0.78f, 1f));
             titleText.fontStyle = FontStyles.Bold;
 
             var currencyText = CreateText(panel.transform, "CurrencyText", new Vector2(0f, 220f), 26);
-            currencyText.color = new Color(0.8f, 0.9f, 1f, 1f);
+            currencyText.color = theme.CurrencyColor.ToColor(new Color(0.82f, 0.9f, 1f, 1f));
+
             var stateText = CreateText(panel.transform, "StateText", new Vector2(0f, 185f), 20);
-            stateText.color = new Color(0.65f, 0.8f, 0.95f, 1f);
+            stateText.color = theme.StateColor.ToColor(new Color(0.68f, 0.82f, 0.95f, 1f));
+
             var resultText = CreateText(panel.transform, "ResultText", new Vector2(0f, -40f), 20);
             resultText.alignment = TextAlignmentOptions.TopLeft;
-            resultText.color = new Color(0.96f, 0.96f, 1f, 1f);
+            resultText.color = theme.ResultColor.ToColor(new Color(0.95f, 0.95f, 1f, 1f));
+
+            var poolInfoText = CreateText(panel.transform, "PoolInfoText", new Vector2(0f, 130f), 19);
+            poolInfoText.text = "限定 UP 角色祈愿 · 10 连必出四星或更高";
+            poolInfoText.color = new Color(0.88f, 0.92f, 1f, 0.88f);
+            poolInfoText.alignment = TextAlignmentOptions.Center;
 
             var cardGrid = CreateCardGrid(panel.transform);
-            var cardTemplate = CreateCardTemplate(cardGrid.transform);
+            var cardTemplate = CreateCardTemplate(cardGrid.transform, theme);
             cardTemplate.SetActive(false);
+            var revealCardPreview = CreateRevealCardPreview(panel.transform, cardTemplate);
 
-            var singleBtn = CreateButton(panel.transform, "SingleDraw", "单抽", new Vector2(-220f, -300f));
-            var tenBtn = CreateButton(panel.transform, "TenDraw", "十连", new Vector2(0f, -300f));
-            var skipBtn = CreateButton(panel.transform, "Skip", "跳过", new Vector2(220f, -300f));
-            StyleButton(singleBtn.GetComponent<Image>(), new Color(0.55f, 0.67f, 0.95f, 1f));
-            StyleButton(tenBtn.GetComponent<Image>(), new Color(0.78f, 0.63f, 0.98f, 1f));
+            var bottomBar = CreatePanel(panel.transform, new Vector2(0.5f, 0f), new Vector2(900f, 96f));
+            bottomBar.name = "BottomBar";
+            bottomBar.anchoredPosition = new Vector2(0f, 58f);
+            var bottomBarImage = bottomBar.GetComponent<Image>();
+            bottomBarImage.color = new Color(0.04f, 0.08f, 0.14f, 0.64f);
+            bottomBarImage.raycastTarget = false;
+
+            var singleBtn = CreateButton(panel.transform, "SingleDraw", "祈愿 x1", new Vector2(-220f, -300f));
+            var tenBtn = CreateButton(panel.transform, "TenDraw", "祈愿 x10", new Vector2(0f, -300f));
+            var skipBtn = CreateButton(panel.transform, "Skip", "跳过演出", new Vector2(220f, -300f));
+
+            StyleButton(singleBtn.GetComponent<Image>(), new Color(0.58f, 0.68f, 0.96f, 1f));
+            StyleButton(tenBtn.GetComponent<Image>(), new Color(0.8f, 0.66f, 0.98f, 1f));
             StyleButton(skipBtn.GetComponent<Image>(), new Color(0.7f, 0.74f, 0.82f, 1f));
-            TryApplySprite(singleBtn.GetComponent<Image>(), "GachaTheme/btn_single");
-            TryApplySprite(tenBtn.GetComponent<Image>(), "GachaTheme/btn_ten");
-            TryApplySprite(skipBtn.GetComponent<Image>(), "GachaTheme/btn_skip");
+
+            TryApplySprite(singleBtn.GetComponent<Image>(), FirstNotEmpty(theme.ButtonSprites?.SingleDraw, "GachaTheme/btn_single"));
+            TryApplySprite(tenBtn.GetComponent<Image>(), FirstNotEmpty(theme.ButtonSprites?.TenDraw, "GachaTheme/btn_ten"));
+            TryApplySprite(skipBtn.GetComponent<Image>(), FirstNotEmpty(theme.ButtonSprites?.Skip, "GachaTheme/btn_skip"));
 
             var flash = CreatePanel(panel.transform, new Vector2(0.5f, 0.5f), new Vector2(520f, 220f));
             var flashImg = flash.GetComponent<Image>();
-            flashImg.color = new Color(1f, 1f, 1f, 0.28f);
+            flashImg.color = new Color(1f, 1f, 1f, 0f);
             flashImg.raycastTarget = false;
             flash.gameObject.SetActive(false);
 
@@ -77,6 +136,7 @@ namespace GachaDemo.Presentation
             meteor.name = "MeteorTrail";
             var meteorImg = meteor.GetComponent<Image>();
             meteorImg.color = new Color(0.75f, 0.88f, 1f, 0.95f);
+            meteorImg.raycastTarget = false;
             meteor.gameObject.SetActive(false);
             meteor.transform.SetAsLastSibling();
 
@@ -87,7 +147,7 @@ namespace GachaDemo.Presentation
             borderImg.raycastTarget = false;
             var borderOutline = fiveStarBorder.gameObject.AddComponent<Outline>();
             borderOutline.effectDistance = new Vector2(3f, 3f);
-            borderOutline.effectColor = new Color(1f, 0.82f, 0.3f, 0.9f);
+            borderOutline.effectColor = theme.FiveStarOutlineColor.ToColor(new Color(1f, 0.82f, 0.3f, 0.9f));
             fiveStarBorder.gameObject.SetActive(false);
 
             var rarityText = CreateText(panel.transform, "RarityText", new Vector2(0f, 120f), 42);
@@ -99,6 +159,7 @@ namespace GachaDemo.Presentation
             revealSerialized.Set("fiveStarBorder", borderImg);
             revealSerialized.Set("meteorTrail", meteorImg);
             revealSerialized.Set("rarityText", rarityText);
+            revealSerialized.Set("previewCard", revealCardPreview);
 
             var resultPanel = panel.gameObject.AddComponent<ResultPanelUI>();
             var resultSerialized = new SerializedObjectAdapter(resultPanel);
@@ -196,7 +257,7 @@ namespace GachaDemo.Presentation
 
             var text = CreateText(go.transform, name + "Text", Vector2.zero, 24);
             text.text = label;
-            text.color = Color.black;
+            text.color = new Color(0.08f, 0.1f, 0.14f);
             text.raycastTarget = false;
             var textRt = text.rectTransform;
             textRt.anchorMin = Vector2.zero;
@@ -226,7 +287,7 @@ namespace GachaDemo.Presentation
             return rt;
         }
 
-        private static GameObject CreateCardTemplate(Transform parent)
+        private static GameObject CreateCardTemplate(Transform parent, GachaThemeConfig theme)
         {
             var card = new GameObject("ResultCardTemplate", typeof(RectTransform), typeof(Image));
             card.transform.SetParent(parent, false);
@@ -234,11 +295,20 @@ namespace GachaDemo.Presentation
             cardRt.sizeDelta = new Vector2(200f, 160f);
             var image = card.GetComponent<Image>();
             image.color = new Color(0.4f, 0.5f, 0.7f, 0.95f);
-            TryApplySprite(image, "GachaTheme/card_bg");
+            TryApplySprite(image, FirstNotEmpty(theme.CardBackgroundSprite, "GachaTheme/card_bg"));
 
             var frame = card.AddComponent<Outline>();
             frame.effectDistance = new Vector2(2f, 2f);
             frame.effectColor = new Color(1f, 1f, 1f, 0.35f);
+
+            var cardFrameOverlay = CreatePanel(card.transform, new Vector2(0.5f, 0.5f), new Vector2(194f, 154f));
+            cardFrameOverlay.name = "CardFrameOverlay";
+            var cardFrameOverlayImage = cardFrameOverlay.GetComponent<Image>();
+            cardFrameOverlayImage.color = new Color(1f, 1f, 1f, 0.08f);
+            cardFrameOverlayImage.raycastTarget = false;
+            var cardFrameOutline = cardFrameOverlay.gameObject.AddComponent<Outline>();
+            cardFrameOutline.effectDistance = new Vector2(1.2f, 1.2f);
+            cardFrameOutline.effectColor = new Color(1f, 1f, 1f, 0.3f);
 
             var glow = CreatePanel(card.transform, new Vector2(0.5f, 0.5f), new Vector2(200f, 160f));
             glow.name = "Glow";
@@ -252,6 +322,10 @@ namespace GachaDemo.Presentation
             stripeImage.color = new Color(0.8f, 0.8f, 0.95f, 0.9f);
             rarityStripe.anchoredPosition = new Vector2(0f, -14f);
             stripeImage.raycastTarget = false;
+            var starText = CreateText(rarityStripe.transform, "StarText", Vector2.zero, 13);
+            starText.text = "★★★";
+            starText.color = new Color(1f, 1f, 1f, 0.95f);
+            starText.fontStyle = FontStyles.Bold;
 
             var portraitFrame = CreatePanel(card.transform, new Vector2(0.5f, 0.5f), new Vector2(172f, 78f));
             portraitFrame.name = "PortraitFrame";
@@ -265,6 +339,7 @@ namespace GachaDemo.Presentation
             var portraitImage = portrait.GetComponent<Image>();
             portraitImage.color = new Color(0.38f, 0.5f, 0.74f, 0.96f);
             portraitImage.raycastTarget = false;
+            portraitImage.preserveAspect = true;
 
             var portraitMark = CreateText(portrait.transform, "PortraitMark", Vector2.zero, 22);
             portraitMark.text = "?";
@@ -282,6 +357,17 @@ namespace GachaDemo.Presentation
             upText.color = Color.white;
             upText.fontStyle = FontStyles.Bold;
 
+            var typeBadge = CreatePanel(card.transform, new Vector2(0f, 0f), new Vector2(44f, 20f));
+            typeBadge.name = "TypeBadge";
+            var typeBadgeImage = typeBadge.GetComponent<Image>();
+            typeBadgeImage.color = new Color(0.18f, 0.24f, 0.35f, 0.88f);
+            typeBadge.anchoredPosition = new Vector2(30f, 14f);
+            typeBadgeImage.raycastTarget = false;
+            var typeText = CreateText(typeBadge.transform, "TypeBadgeText", Vector2.zero, 12);
+            typeText.text = "角色";
+            typeText.color = new Color(1f, 1f, 1f, 0.96f);
+            typeText.fontStyle = FontStyles.Bold;
+
             var dupTag = CreatePanel(card.transform, new Vector2(1f, 1f), new Vector2(66f, 24f));
             dupTag.name = "DupTag";
             var dupTagImage = dupTag.GetComponent<Image>();
@@ -289,7 +375,7 @@ namespace GachaDemo.Presentation
             dupTag.anchoredPosition = new Vector2(-36f, -14f);
             dupTagImage.raycastTarget = false;
             var dupText = CreateText(dupTag.transform, "DupTagText", Vector2.zero, 13);
-            dupText.text = "DUP";
+            dupText.text = "已拥有";
             dupText.color = Color.white;
             dupText.fontStyle = FontStyles.Bold;
 
@@ -298,21 +384,59 @@ namespace GachaDemo.Presentation
             nameText.color = Color.white;
             nameText.fontStyle = FontStyles.Bold;
 
+            var namePlate = CreatePanel(card.transform, new Vector2(0.5f, 0f), new Vector2(182f, 38f));
+            namePlate.name = "NamePlate";
+            var namePlateImage = namePlate.GetComponent<Image>();
+            namePlateImage.color = new Color(0.07f, 0.11f, 0.18f, 0.72f);
+            namePlate.anchoredPosition = new Vector2(0f, 30f);
+            namePlateImage.raycastTarget = false;
+            namePlate.SetSiblingIndex(2);
+
             var metaText = CreateText(card.transform, "MetaText", new Vector2(0f, -48f), 17);
             metaText.rectTransform.sizeDelta = new Vector2(180f, 44f);
             metaText.color = new Color(0.95f, 0.95f, 1f, 0.96f);
-
             return card;
+        }
+
+        private static GameObject CreateRevealCardPreview(Transform parent, GameObject template)
+        {
+            var preview = Object.Instantiate(template, parent);
+            preview.name = "RevealCardPreview";
+            preview.SetActive(false);
+
+            if (preview.TryGetComponent<RectTransform>(out var rect))
+            {
+                rect.anchorMin = new Vector2(0.5f, 0.5f);
+                rect.anchorMax = new Vector2(0.5f, 0.5f);
+                rect.pivot = new Vector2(0.5f, 0.5f);
+                rect.sizeDelta = new Vector2(320f, 230f);
+                rect.anchoredPosition = new Vector2(0f, -10f);
+            }
+
+            return preview;
         }
 
         private static void StyleButton(Image image, Color color)
         {
             image.color = color;
+            if (!image.TryGetComponent<Button>(out var button))
+            {
+                return;
+            }
+
+            var colors = button.colors;
+            colors.normalColor = Color.white;
+            colors.highlightedColor = new Color(1f, 1f, 1f, 0.92f);
+            colors.pressedColor = new Color(0.9f, 0.9f, 0.9f, 1f);
+            colors.disabledColor = new Color(0.65f, 0.65f, 0.65f, 0.75f);
+            colors.colorMultiplier = 1f;
+            colors.fadeDuration = 0.08f;
+            button.colors = colors;
         }
 
         private static void TryApplySprite(Image target, string resourcePath)
         {
-            var sprite = Resources.Load<Sprite>(resourcePath);
+            var sprite = GachaThemeRuntime.TryLoadSprite(resourcePath);
             if (sprite == null)
             {
                 return;
@@ -384,6 +508,11 @@ namespace GachaDemo.Presentation
             );
 
             return _runtimeCjkFont != null ? _runtimeCjkFont : TMP_Settings.defaultFontAsset;
+        }
+
+        private static string FirstNotEmpty(string primary, string fallback)
+        {
+            return string.IsNullOrWhiteSpace(primary) ? fallback : primary;
         }
 
         private sealed class SerializedObjectAdapter

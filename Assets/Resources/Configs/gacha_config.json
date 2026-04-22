@@ -2,7 +2,7 @@
   "Pools": [
     {
       "PoolId": "limited_character",
-      "DisplayName": "Twilight Bloom",
+      "DisplayName": "角色活动祈愿",
       "SoftPityStart": 74,
       "HardPity": 90,
       "FourStarHardPity": 10,
