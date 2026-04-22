@@ -1,0 +1,34 @@
+{
+  "Pools": [
+    {
+      "PoolId": "limited_character",
+      "DisplayName": "Twilight Bloom",
+      "SoftPityStart": 74,
+      "HardPity": 90,
+      "FourStarHardPity": 10,
+      "BaseFiveStarRate": 0.006,
+      "BaseFourStarRate": 0.051,
+      "UpFiveStarIds": ["c_001"],
+      "UpFourStarIds": ["c_101", "c_102", "c_103"],
+      "Groups": [
+        { "Star": 5, "RewardIds": ["c_001", "c_002", "w_501"] },
+        { "Star": 4, "RewardIds": ["c_101", "c_102", "c_103", "w_401", "w_402"] },
+        { "Star": 3, "RewardIds": ["w_301", "w_302", "w_303", "w_304"] }
+      ]
+    }
+  ],
+  "Rewards": [
+    { "Id": "c_001", "Name": "Astra", "Type": 0, "Star": 5, "IsUp": true },
+    { "Id": "c_002", "Name": "Veyra", "Type": 0, "Star": 5, "IsUp": false },
+    { "Id": "w_501", "Name": "Skyfall Edge", "Type": 1, "Star": 5, "IsUp": false },
+    { "Id": "c_101", "Name": "Kira", "Type": 0, "Star": 4, "IsUp": true },
+    { "Id": "c_102", "Name": "Noel", "Type": 0, "Star": 4, "IsUp": true },
+    { "Id": "c_103", "Name": "Yuna", "Type": 0, "Star": 4, "IsUp": true },
+    { "Id": "w_401", "Name": "Moon Spear", "Type": 1, "Star": 4, "IsUp": false },
+    { "Id": "w_402", "Name": "Echo Bow", "Type": 1, "Star": 4, "IsUp": false },
+    { "Id": "w_301", "Name": "Bronze Sword", "Type": 1, "Star": 3, "IsUp": false },
+    { "Id": "w_302", "Name": "Hunter Bow", "Type": 1, "Star": 3, "IsUp": false },
+    { "Id": "w_303", "Name": "Traveler Tome", "Type": 1, "Star": 3, "IsUp": false },
+    { "Id": "w_304", "Name": "Stone Lance", "Type": 1, "Star": 3, "IsUp": false }
+  ]
+}
